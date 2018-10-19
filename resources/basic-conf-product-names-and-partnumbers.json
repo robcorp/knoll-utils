@@ -37,10 +37,6 @@
 "PARTNUMBER":"196690L"
 },
 {
-"NAME":"1966 Coffee and End Tables DESIGN ",
-"PARTNUMBER":"196618LP"
-},
-{
 "NAME":"1966 Contour Chaise",
 "PARTNUMBER":"196641"
 },
@@ -67,10 +63,6 @@
 {
 "NAME":"1966 Dining Table - High DESIGN",
 "PARTNUMBER":"196626"
-},
-{
-"NAME":"1966 Dining Table DESIGN",
-"PARTNUMBER":"196628HP"
 },
 {
 "NAME":"1966 Double Rocker",
@@ -177,10 +169,6 @@
 "PARTNUMBER":"BO2"
 },
 {
-"NAME":"Barcelona® Chair - Childs",
-"PARTNUMBER":"250LC-S"
-},
-{
 "NAME":"Bertoia Barstool",
 "PARTNUMBER":"428C"
 },
@@ -227,10 +215,6 @@
 {
 "NAME":"Bertoia Diamond Chair with Full Cover",
 "PARTNUMBER":"421"
-},
-{
-"NAME":"Bertoia Large Diamond Chair",
-"PARTNUMBER":"422LU"
 },
 {
 "NAME":"Bertoia Molded Shell Barstool",
@@ -331,14 +315,6 @@
 {
 "NAME":"Copeland Light™",
 "PARTNUMBER":"COPE02K"
-},
-{
-"NAME":"DUrso High Tables",
-"PARTNUMBER":"6242"
-},
-{
-"NAME":"DUrso Low Tables",
-"PARTNUMBER":"6242"
 },
 {
 "NAME":"DUrso Swivel Chair",
@@ -527,14 +503,6 @@
 {
 "NAME":"Gehry Hat Trick™ Chair",
 "PARTNUMBER":"91CGC"
-},
-{
-"NAME":"Gehry High Sticking™ Chair",
-"PARTNUMBER":"92C"
-},
-{
-"NAME":"Gehry Power Play™ Chair and Ottoman",
-"PARTNUMBER":"94L"
 },
 {
 "NAME":"Generation by Knoll®",
@@ -765,18 +733,6 @@
 "PARTNUMBER":"OAC1"
 },
 {
-"NAME":"Ollo",
-"PARTNUMBER":"ollo"
-},
-{
-"NAME":"Ollo Redirect",
-"PARTNUMBER":"ollo"
-},
-{
-"NAME":"Orchestra",
-"PARTNUMBER":"none"
-},
-{
 "NAME":"Oval Leather Pull",
 "PARTNUMBER":"90000C"
 },
@@ -925,14 +881,6 @@
 "PARTNUMBER":"12"
 },
 {
-"NAME":"Pop Up",
-"PARTNUMBER":"none"
-},
-{
-"NAME":"Pop Up Floorstanding",
-"PARTNUMBER":"none"
-},
-{
 "NAME":"ReGeneration by Knoll ",
 "PARTNUMBER":"441"
 },
@@ -1031,10 +979,6 @@
 {
 "NAME":"Robert Venturi Model 69 Low Table",
 "PARTNUMBER":"VINT011"
-},
-{
-"NAME":"Rockwell Unscripted Big Easy Table",
-"PARTNUMBER":"UTBE"
 },
 {
 "NAME":"Rockwell Unscripted Club Chair",
@@ -1221,10 +1165,6 @@
 "PARTNUMBER":"70L"
 },
 {
-"NAME":"Saarinen Womb Chair - Childs",
-"PARTNUMBER":"70LS"
-},
-{
 "NAME":"Saarinen Womb Chair - Medium",
 "PARTNUMBER":"70LM"
 },
@@ -1237,20 +1177,12 @@
 "PARTNUMBER":"73L"
 },
 {
-"NAME":"Sapper 50® Double Monitor Arm",
-"PARTNUMBER":"SAPMA50D"
-},
-{
 "NAME":"Sapper 50® Monitor Arm",
 "PARTNUMBER":"SAPMA50S"
 },
 {
 "NAME":"Sapper XYZ®",
 "PARTNUMBER":"XYZMAS"
-},
-{
-"NAME":"Sapper XYZ® 30",
-"PARTNUMBER":"XYZMAS30"
 },
 {
 "NAME":"Sapper XYZ® Crossbar",
@@ -1331,18 +1263,6 @@
 {
 "NAME":"Topiary Bench",
 "PARTNUMBER":"TOP455"
-},
-{
-"NAME":"Topiary Dining Chair",
-"PARTNUMBER":"TOP-45"
-},
-{
-"NAME":"Topiary Dining Table",
-"PARTNUMBER":"TOP-28"
-},
-{
-"NAME":"Topiary Lounge Chair",
-"PARTNUMBER":"TOP-25"
 },
 {
 "NAME":"Trivet - 8",

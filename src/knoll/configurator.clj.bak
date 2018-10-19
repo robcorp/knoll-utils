@@ -1,0 +1,76 @@
+(ns knoll.configurator
+  (:require [cheshire.core :refer [decode]]
+            [org.httpkit.client :as http]
+            [com.rpl.specter :as spctr]
+            [clojure.spec.alpha :as s]
+            [clojure.spec.test.alpha :as st]
+            [clojure.spec.gen.alpha :as gen]
+
+            ))
+
+;; Configurator Specs
+
+(s/def ::Configurator (s/keys :req-un [::partNumber ::name ::description ::cartonWeight
+                                       ::listPrice ::price ::salePrice ::quickShip
+                                       ::saleStartDate ::saleEndDate
+                                       ::preconfigurations ::groups
+                                       ::endsOn ::perUserQuantity ::shippingLocation
+                                       ::cartonCount ::height ::width ::depth ::toutMessage
+                                       ::catalog ]))
+(s/def ::partNumber string?)
+(s/def ::name string?)
+(s/def ::description (s/nilable string?))
+(s/def ::cartonWeight (s/double-in :min 0.0))
+(s/def ::listPrice (s/nilable (s/double-in :min 0.0)))
+(s/def ::salePrice (s/nilable (s/double-in :min 0.0)))
+(s/def ::quickShip nat-int?)
+(s/def ::saleStartDate (s/nilable string?))
+(s/def ::saleEndDate (s/nilable string?))
+(s/def ::preconfigurations (s/coll-of string?))
+(s/def ::group (s/keys :req-un [::code ::description ::optionGroupCode
+                                 ::choiceType ::choices
+                                 ::displayOption
+                                 ::historicalCutoff
+                                 ::historicalSequence
+                                 ::sequence
+                                 ::subGroup
+                                ::tooltip]))
+(s/def ::code string?)
+(s/def ::description (s/nilable string?))
+(s/def ::optionGroupCode string?)
+(s/def ::choiceType (s/nilable string?))
+(s/def ::groups (s/coll-of ::group))
+
+
+
+#_(def configurator-service-url "//knldev2wcsapp1a.knoll.com/configurator/parts/")
+#_(def configurator-service-url "https://knlprdwcsmgt.knoll.com/configurator/parts/")
+(def configurator-service-url "https://www.knoll.com/configurator/parts/")
+
+(defn get-configurator-for [part]
+  (decode
+   (:body @(http/get (str configurator-service-url part)))
+   true))
+
+(def barcelona-stool (get-configurator-for "251Y"))
+(def generation (get-configurator-for "111"))
+(def pixel-console (get-configurator-for "KS21RG"))
+(def regeneration-fully-upholstered (get-configurator-for "442"))
+(def regeneration-by-knoll (get-configurator-for "441"))
+(def regeneration-high-task (get-configurator-for "441H"))
+(def platner-arm-chair (get-configurator-for "1725A"))
+(def barcelona-couch (get-configurator-for "258LS"))
+
+(def product-configs
+  (list barcelona-stool
+        generation
+        pixel-console
+        regeneration-fully-upholstered
+        regeneration-by-knoll
+        regeneration-high-task
+        platner-arm-chair
+        barcelona-couch))
+
+; validate Configurator data for known products
+(map #(s/valid? ::Configurator %) product-configs)
+

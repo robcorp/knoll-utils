@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="Leiningen: org.clojars.zentrope/ojdbc:11.2.0.3.0">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/org/clojars/zentrope/ojdbc/11.2.0.3.0/ojdbc-11.2.0.3.0.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

@@ -15,7 +15,7 @@
 
 ;; Configurator Specs
 
-(s/def ::configurator (s/keys :req-un [::catalog ::partNumber ::name ::description :configurator/price ::listPrice
+(s/def ::configurator (s/keys :req-un [::catalog ::partNumber ::name ::description :configurator/price :configurator/listPrice
                                        ::width ::height ::depth ::cartonWeight ::cartonCount
                                        ::shippingLocation ::perUserQuantity :configurator/quickShip
                                        ::groups ::preconfigurations
@@ -26,7 +26,7 @@
 (s/def ::name string?)
 (s/def ::description (s/nilable string?))
 (s/def :configurator/price double?)
-(s/def ::listPrice (s/nilable (s/double-in :min 0.0)))
+(s/def :configurator/listPrice (s/nilable (s/double-in :min 0.0)))
 (s/def ::width (s/double-in :min 0.0))
 (s/def ::height (s/double-in :min 0.0))
 (s/def ::depth (s/double-in :min 0.0))
@@ -52,7 +52,7 @@
 (s/def ::groups (s/coll-of ::group))
 (s/def ::choice (s/keys :req-un [::number
                                  :choice/price
-                                 ::listPrice
+                                 :choice/listPrice
                                  :choice/description
                                  ::configurationNote
                                  ::subOptionGroupCode
@@ -70,6 +70,7 @@
                                  ::saleEndDate
                                  ::endsOn
                                  ]))
+(s/def :choice/listPrice double?)
 (s/def :choice/quickShip string?)
 (s/def ::choices (s/coll-of ::choice))
 
@@ -120,4 +121,5 @@
      shuffle
      (take 10)
      (map get-configurator-for)
-     (map #(s/conform ::configurator %)))
+     (map (fn [c] [(:partNumber c) (s/valid? ::configurator c)]))
+     (filter (fn [r] (false? (second r)))))

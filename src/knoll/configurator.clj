@@ -108,7 +108,7 @@
         barcelona-couch))
 
 ; validate Configurator data for known products
-#_(map #(s/valid? ::Configurator %) product-configs)
+(map (fn [c] [(:partNumber c) (if (s/valid? ::configurator c) :valid :invalid)]) product-configs)
 
 ;; take 10 random partnumber, get their configurator data and validate each one against the spec
 (->> partnums

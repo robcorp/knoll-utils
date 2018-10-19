@@ -8,11 +8,6 @@
             [clojure.spec.gen.alpha :as gen]
             ))
 
-
-
-
-
-
 ;; Configurator Specs
 
 (s/def ::configurator (s/keys :req-un [::catalog ::partNumber ::name ::description :configurator/price :configurator/listPrice
@@ -74,6 +69,8 @@
 (s/def :choice/quickShip string?)
 (s/def ::choices (s/coll-of ::choice))
 
+;;;; Confgurator defs and miscellaneous utils
+
 ;; Read in the list of product names and partnumbers
 (def product-partnums (-> (resource "basic-conf-product-names-and-partnumbers.json")
                           slurp
@@ -81,9 +78,6 @@
 
 ;; get the list of all partnumbers
 (def partnums (select [:RECORDS ALL :PARTNUMBER] product-partnums))
-
-
-;;;; Confgurator defs and miscellaneous utils
 
 #_(def configurator-service-url "//knldev2wcsapp1a.knoll.com/configurator/parts/")
 #_(def configurator-service-url "https://knlprdwcsmgt.knoll.com/configurator/parts/")

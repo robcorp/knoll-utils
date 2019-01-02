@@ -12,8 +12,10 @@
             [clj-http.client :as http]
             [com.rpl.specter :as spctr]
             [clojure.spec.alpha :as s]
-            [clojure.spec.test.alpha :as st]
-            #_[orchestra.spec.test :as st]))
+            #_[clojure.spec.test.alpha :as st]
+            [orchestra.spec.test :as st]
+            [clojure.pprint :refer :all]
+            [clojure.core.async :as async :refer [chan >! <! go]]))
 
 
 (s/def ::env-key #{::dev2 ::staging ::prod})
@@ -38,7 +40,7 @@
                                                                 :password "knollorawcdlv"}))}})
 
 (defn connect [env]
-  #_{:pre [(s/valid? ::env-key env)]}
+  {:pre [(s/valid? ::env-key env)]}
   (default-connection (-> config env ::db)))
 
 (s/fdef connect
@@ -72,41 +74,77 @@
 
 (defn show-customindexevents [env]
   (connect env)
-  (select systemevents
-          (where {:eventname [in ["CustomIndexEvent" "CustomTextileIndexEvent"]]})))
+  (->
+   (select systemevents
+           (fields :eventname :enabled :times)
+           (where {:eventname [in ["CustomIndexEvent" "CustomTextileIndexEvent"]]}))
+   print-table))
 
 (defentity knollluceneindexjobqueue)
 
+(defn show-index-queue-counts [env]
+  (connect env)
+  (->
+   (select knollluceneindexjobqueue
+           (fields :assettype (raw "count(*) as COUNT"))
+           (where {:index_status [in ["added" "updated" "update_failed"]]})
+           (group :assettype)
+           (order :assettype))
+   print-table))
+
 (defn show-index-queue [env]
   (connect env)
-  (select knollluceneindexjobqueue
-          (fields :assettype (raw "count(*) as COUNT"))
-          (where {:index_status [in ["added" "updated" "update_failed"]]})
-          (group :assettype)
-          (order :assettype)))
-
+  (->
+   (select knollluceneindexjobqueue
+           (fields :assetid :assettype :index_status)
+           (where {:index_status [in ["added" "updated" "update_failed"]]})
+           #_(group :assettype)
+           (order :assettype))
+   print-table))
 (s/def ::index-q-record (s/keys :req-un [::ASSETTYPE ::COUNT]))
 (s/def ::ASSETTYPE string?)
 (s/def ::COUNT #(instance? java.math.BigDecimal %))
-(s/def ::index-q-records (s/coll-of ::index-q-record))
+(s/def ::index-q-records (s/coll-of ::index-q-record :distinct true))
 
 (s/fdef show-index-queue
   :args (s/cat :env ::env-key)
   :ret ::index-q-records)
 
 
-(defn enable-customindexevent [env flag]
+(defn set-customindexevent [env flag]
   (connect env)
   (upd systemevents
           (set-fields {:enabled (if flag 1M 0M)})
           (where {:eventname "CustomIndexEvent"}))
   (show-customindexevents env))
 
-(defn reindex-now [env]
-  (connect env)
-  (let [custom-index-event (first (select systemevents (where {:eventname "CustomIndexEvent"})))
-        url (str (-> config env ::url) "/cs/" (:TARGET custom-index-event) "?" (:PARAMS custom-index-event))]
-    (future (http/get url))))
+(defn enable-customindexevent [env]
+  (set-customindexevent env true))
+
+(defn disable-customindexevent [env]
+  (set-customindexevent env false))
+
+(let [running (atom {::dev2 false ::staging false ::prod false})]
+  (defn reindex [env]
+    "Sends the reindex http request for the specified env on a newly created channel.
+Uses running flags to prevent sending multiple overlapping reindex requests."
+    #_(println "Current state of running flags =" @running)
+    (if (env @running)
+      (println "Reindex in" env "is already running.")
+      (do
+        (swap! running update env not)
+        (println "Starting to reindex" env "...")
+        (connect env)
+        (let [custom-index-event (first (select systemevents (where {:eventname "CustomIndexEvent"})))
+              ;_ (println custom-index-event)
+              url (str (-> config env ::url) "/cs/" (:TARGET custom-index-event) "?" (:PARAMS custom-index-event))
+              ;_ (println url)
+              ch (chan)]
+          (go (>! ch (http/get url)))
+          (go (when-let [res (<! ch)]
+                (swap! running update env not)
+                (println "Reindexing" env "complete."))))
+        nil))))
 
 (defn get-knolltextile-for-fabricid [env fabid]
   (connect env)

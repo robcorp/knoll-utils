@@ -172,10 +172,10 @@
                     "Cal. Title 19 " "Colorfastness Dry" "Colorfastness Dry 2" "Colorfastness Dry 3" "Colorfastness Wet" "Colorfastness Wet 2" "Colorfastness Wet 3"
                     "Dry clean - Warp" "Dry clean - weft" "FAA 25.853B, with treatment" "FMVSS 302, as stocked" "Fabric Thickness" "G-21 Anti-Fungal Test"
                     "Greenguard Certification" "IMO 2010 FTP Code, Part 8 for Upholstery" "IMO A652 (16) 8.2, as stocked" "IMO A652 (16) 8.2, with FR treatment"
-                    "IMO A652 (16) 8.3, as stocked" "IMO A652 (16) 8.3, with FR treatment" "IMO for Drapery, as stocked" "Jungle Test - ISO1419 Method C "
-                    "Launderability Warp" "Launderability Warp 5" "Launderability Weft" "Launderability Weft 5" "Lightfastness 1000 hrs" "Lightfastness 40 Hours 3"
-                    "Lightfastness 40 Hrs. 4" "Lightfastness 40 hour 2" "Lightfastness 40 hrs" "Lightfastness 60 hrs" "Lightfastness, 200 hours" "Mace Snag"
-                    "Martindale Abrasion" "Martindale Abrasion 2" "Martindale Abrasion Published" "Martindale Brush Pill" "Martindale Pill" "Martindale Pill 2"
+                    "IMO A652 (16) 8.3, as stocked" "IMO A652 (16) 8.3, with FR treatment" "IMO for Drapery, as stocked" "IMO 2010 FTP Part 8 for Upholstery with Finish"
+                    "Jungle Test - ISO1419 Method C " "Launderability Warp" "Launderability Warp 5" "Launderability Weft" "Launderability Weft 5" "Lightfastness 1000 hrs"
+                    "Lightfastness 40 Hours 3" "Lightfastness 40 Hrs. 4" "Lightfastness 40 hour 2" "Lightfastness 40 hrs" "Lightfastness 60 hrs" "Lightfastness, 200 hours"
+                    "Mace Snag" "Martindale Abrasion" "Martindale Abrasion 2" "Martindale Abrasion Published" "Martindale Brush Pill" "Martindale Pill" "Martindale Pill 2"
                     "NFPA 260 (UFAC)" "NFPA 260 (UFAC) 2" "NFPA 260 (UFAC) 3" "NFPA 701 '96 Test 1, as stocked" "NFPA 701 '96 Test 1, with topical treatment"
                     "NFPA 701 - 2015 TM#1, as stocked" "NFPA 701 2010 TM#1 with FR treatment" "NFPA 701 2010 TM1, as stocked" "NFPA 701 2015"
                     "NFPA 701 Small Scale '89, as stocked" "NFPA 701 Small Scale '89, with topical treatment" "NFPA 701 Test 1 - 1999- Fabric unbacked"
@@ -288,8 +288,8 @@
                       (:body @(http/get (str textile-service-url "fabrics") http-options)) true)))
 
 (def fabrics' (-> (resource "fabrics.json")
-                      slurp
-                      (decode true)))
+                  slurp
+                  (decode true)))
 
 (defn ^:private -get-fabric [fabid]
   (let [resp @(http/get (str textile-service-url fabid))]
@@ -331,8 +331,12 @@
 #_(s/valid? ::Textile (first (gen/sample (s/gen ::Textile) 1)))
 
 ;; validate all Textiles returned from the webservice
-(if-not (s/valid? ::Textiles @fabrics)
-  (do
-    (println "Textiles validation failed due to the following:")
-    (s/explain ::Textiles @fabrics))
-  (println "All Textiles are valid."))
+(defn validate-all-textiles []
+  (if-not (s/valid? ::Textiles @fabrics)
+    (do
+      (println "Textiles validation failed due to the following:")
+      (s/explain ::Textiles @fabrics))
+    (println "All Textiles are valid.")))
+
+(validate-all-textiles)
+

@@ -1,13 +1,11 @@
 (ns knoll.db
   (:require [clojure.string :as str]
-            [korma.core
+            [korma.core :as k
              :refer [defentity fields group order raw select set-fields
                      subselect update where]
-             :rename {update upd}
-             :as k]
-            [korma.db
-             :refer [default-connection defdb create-db]
-             :as kd]
+             :rename {update upd}]
+            [korma.db :as kd
+             :refer [default-connection defdb create-db]]
             #_[org.httpkit.client :as http]
             [clj-http.client :as http]
             [com.rpl.specter :as spctr]
@@ -62,7 +60,9 @@
   #_(entity-fields :id :name :description :attributetype :subtype))
 
 (defentity product_c_mungo)
+
 (defentity knoll_news_c)
+(defentity knoll_news_a)
 
 ;;(select systemusers)
 ;;(select systemusers (fields :id :username))
@@ -136,9 +136,9 @@ Uses running flags to prevent sending multiple overlapping reindex requests."
         (println "Starting to reindex" env "...")
         (connect env)
         (let [custom-index-event (first (select systemevents (where {:eventname "CustomIndexEvent"})))
-              ;_ (println custom-index-event)
+              #_(println custom-index-event)
               url (str (-> config env ::url) "/cs/" (:TARGET custom-index-event) "?" (:PARAMS custom-index-event))
-              ;_ (println url)
+              #_(println url)
               ch (chan)]
           (go (>! ch (http/get url)))
           (go (when-let [res (<! ch)]
@@ -155,3 +155,7 @@ Uses running flags to prevent sending multiple overlapping reindex requests."
                                              {:cs_attrid 1334871353607M}
                                              {:stringvalue fabid})))]})))
 
+
+#_(print-table (select product_a (fields :id :name :description)))
+
+(run! show-customindexevents (keys config))

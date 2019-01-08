@@ -4,22 +4,22 @@
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
 
-  :dependencies [[org.clojure/clojure "1.9.0"]
+  :dependencies [[org.clojure/clojure "1.10.0"]
                  [org.clojure/core.async "0.4.490"]
                  [org.clojure/test.check "0.9.0"]
-                 [orchestra "2018.09.10-1"]
-                 [nrepl "0.4.5"]
+                 [orchestra "2018.12.06-2"]
+                 [nrepl "0.5.3"]
                  [com.rpl/specter "1.1.2"]
                  [http-kit "2.3.0"]
-                 [clj-http "3.9.0"]
+                 #_[clj-http "3.9.0"]
                  [cheshire "5.8.0"]
                  [korma "0.4.3"]
                  [org.clojars.zentrope/ojdbc "11.2.0.3.0"]
-                 [net.sf.jt400/jt400 "9.4"]
+                 [net.sf.jt400/jt400 "9.4"] ; for TPID db
                  [etaoin "0.2.8-SNAPSHOT"]
-                 ;;[org.gebish/geb-core "2.0"]
-                 [clucy "0.4.0"]
-                 [com.cerner/clara-rules "0.19.0"]
+                 #_[org.gebish/geb-core "2.0"]
+                 #_[clucy "0.4.0"]
+                 #_[com.cerner/clara-rules "0.19.0"]
                  ]
 
   :plugins [

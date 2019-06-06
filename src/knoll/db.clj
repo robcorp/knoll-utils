@@ -18,12 +18,32 @@
 
 (s/def ::env-key #{::dev2 ::staging ::prod})
 
+
+(comment
+  "jdbc:as400://KNL400S;libraries=KNLEGQAV2;translate binary=true"
+  "SBDUSER"
+  "sbd2000"
+  "com.ibm.as400.access.AS400JDBCDriver")
+
+(def tpid-db-spec
+  {:classname "com.ibm.as400.access.AS400JDBCDriver"
+   :subprotocol "as400"
+   :naming {:keys str/upper-case
+            :fields str/upper-case}
+   :make-pool? true
+   :subname "jdbc:as400://KNL400S;libraries=KNLEGQAV2;translate binary=true"
+   :user "SBDUSER"
+   :password "sbd2000"})
+
+(def tpid-db (create-db tpid-db-spec))
+
+
 (defonce ^:private common-db-spec {:classname "oracle.jdbc.driver.OracleDriver"
                                    :subprotocol "oracle"
                                    :naming {:keys str/upper-case
                                             :fields str/upper-case}
                                    :make-pool? true})
-            
+
 (defonce config {::dev2 {::url "http://knldev2wcsapp1a.knoll.com:7003"
                          ::db (create-db (merge common-db-spec {:subname "thin:@knldev2wcsdb1.knoll.com:1521:WCSDEV2"
                                                                 :user "ORAWCDEV11"
@@ -128,7 +148,6 @@
   (defn reindex [env]
     "Sends the reindex http request for the specified env on a newly created channel.
 Uses running flags to prevent sending multiple overlapping reindex requests."
-    #_(println "Current state of running flags =" @running)
     (if (env @running)
       (println "Reindex in" env "is already running.")
       (do
@@ -136,14 +155,12 @@ Uses running flags to prevent sending multiple overlapping reindex requests."
         (println "Starting to reindex" env "...")
         (connect env)
         (let [custom-index-event (first (select systemevents (where {:eventname "CustomIndexEvent"})))
-              #_(println custom-index-event)
               url (str (-> config env ::url) "/cs/" (:TARGET custom-index-event) "?" (:PARAMS custom-index-event))
-              #_(println url)
               ch (chan)]
           (go (>! ch (http/get url)))
-          (go (when-let [res (<! ch)]
+          (go (when-let [_ (<! ch)]
                 (swap! running update env not)
-                (println "Reindexing" env "complete."))))
+                (println "\nReindexing" env "complete."))))
         nil))))
 
 (defn get-knolltextile-for-fabricid [env fabid]
@@ -158,4 +175,19 @@ Uses running flags to prevent sending multiple overlapping reindex requests."
 
 #_(print-table (select product_a (fields :id :name :description)))
 
-(run! show-customindexevents (keys config))
+#_(k/delete knollluceneindexjobqueue (where {:assetid 1356039745953}))
+
+(run! #(do
+         (println)
+         (print %)
+         (show-customindexevents %)
+         (println))
+      (keys config))
+
+(run! #(do
+         (println)
+         (println %)
+         (show-index-queue-counts %)
+         (println))
+      (keys config))
+

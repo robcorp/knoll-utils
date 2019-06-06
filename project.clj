@@ -11,22 +11,23 @@
                  [nrepl "0.5.3"]
                  [com.rpl/specter "1.1.2"]
                  [http-kit "2.3.0"]
-                 #_[clj-http "3.9.0"]
+                 [clj-http "3.9.0"]
                  [cheshire "5.8.0"]
                  [korma "0.4.3"]
                  [org.clojars.zentrope/ojdbc "11.2.0.3.0"]
                  [net.sf.jt400/jt400 "9.4"] ; for TPID db
                  [etaoin "0.2.8-SNAPSHOT"]
+                 [com.novemberain/monger "3.5.0"]
+                 [proto-repl "0.3.1"]
                  #_[org.gebish/geb-core "2.0"]
                  #_[clucy "0.4.0"]
-                 #_[com.cerner/clara-rules "0.19.0"]
-                 ]
+                 #_[com.cerner/clara-rules "0.19.0"]]
 
   :plugins [
-            #_[cider/cider-nrepl "0.18.0"]
+            #_[cider/cider-nrepl "0.19.0"]
             #_[lein-gorilla "0.4.0"]
             #_[lein-localrepo "0.5.4"]]
-  
+
   :repl-options {:port 6439}
-  
+
   :main knoll.core)

@@ -2,14 +2,13 @@
   (:require [cheshire.core :refer [decode encode]] ; json encoding/decoding
             [clojure.java.io :refer [resource]]
             [org.httpkit.client :as http]
-            #_[clj-http.client :as http]
-            [com.rpl.specter :refer [ALL select transform] :as spctr] 
+            [com.rpl.specter :refer [ALL select transform] :as spctr]
             [clojure.spec.alpha :as s]
             [clojure.spec.test.alpha :as st]
-            [clojure.spec.gen.alpha :as gen]
             #_[orchestra.spec.test :as st]
+            [clojure.spec.gen.alpha :as gen]
             [clojure.pprint :refer [pprint print-table]]))
-            
+
 
 ;; Textiles Specs
 #_(def unique-color-names (into (sorted-set)
@@ -38,7 +37,7 @@
 (s/def ::FabricUses (s/coll-of ::FabricUse :distinct true :max-count 5))
 (s/def ::KnollGrade #{"10" "20" "30" "40" "45" "A" "B" "B " "C" "Custom" "D" "E" "F" "G" "H" "I" "N/A"})
 (s/def ::PatternVerticalFormatted (s/nilable string?))
-(s/def ::PatternVertical (s/nilable (into #{"0.3" "0.66" "1.35" "2.4" "2.88"} (map str (range 0.0 125.0 0.25)))))
+(s/def ::PatternVertical (s/nilable string? #_(into #{"0.3" "0.66" "1.35" "2.4" "2.88"} (map str (range 0.0 125.0 0.25)))))
 (s/def ::CleaningCode (s/nilable  #{""
                                     "Clean with water or solvent based cleaning agents, or diluted household bleach."
                                     "Only mild, pure water-free dry cleaning solvents may be used for cleaning this fabric."
@@ -53,19 +52,12 @@
                                         "NR* - Can be railroaded"
                                         "RR - Railroaded"}))
 (s/def ::AverageBoltsPerYard  #{"N/A" "15" "21" "22" "23" "25" "250" "27" "28" "30" "31" "32" "33" "35" "36" "37"
-                                "38" "39" "40" "41" "43" "44" "45" "50" "52" "54" "55" "60" "62" "65" "66"
+                                "38" "39" "40" "41" "43" "44" "45" "48" "50" "52" "54" "55" "60" "62" "65" "66"
                                 "70" "75" "80" "88" "110"})
-(s/def ::PatternHorizontal  #{"0.0" "0.09" "0.25" "0.3" "0.45" "0.5" "0.75" "1.0" "1.25" "1.5" "1.75" "10.0"
-                              "10.5" "10.75" "11.0" "11.75" "12.0" "12.5" "13.0" "13.5" "13.75" "14.0" "14.25"
-                              "14.5" "14.75" "15.0" "15.25" "16.5" "17.25" "17.5" "18.0" "18.5" "19.6" "2.0"
-                              "2.25" "2.3" "2.38" "2.5" "2.75" "20.5" "24.25" "25.0" "25.5" "26.5" "27.0" "27.25"
-                              "27.5" "27.75" "28.0" "28.25" "29.5" "3.0" "3.25" "3.5" "3.6" "3.75" "30.25" "36.0"
-                              "37.0" "4.0" "4.25" "4.5" "4.75" "48.0" "5.0" "5.25" "5.75" "50.0" "51.0" "51.25"
-                              "52.0" "53.0" "54.0" "54.75" "55.0" "56.0" "58.0" "6.0" "6.25" "6.5" "6.75" "7.0"
-                              "7.25" "7.75" "71.75" "72.0" "8.0" "8.25" "8.5" "9.0" "9.25" "9.5" "99.0"})
-(s/def ::WeightFormatted (s/nilable (into #{"N/A" "7.1 oz." "2.6 oz." "16.8 oz."} (map #(str % " oz." ) (range 1.0 44.0 0.25)))))
-(s/def ::UseName #{"" "Cubicle" "Drapery" "HC" "Panel" "Upholstery" "Wallcovering" "Luxe"})
-(s/def ::UseCode #{"" "C" "D" "HC" "K" "KL" "QK" "W" "WC"})
+
+
+(s/def ::UseName #{"" "Cubicle" "Drapery" "HC" "Panel" "Upholstery" "Wallcovering" "Luxe" "Wrapped Panel"})
+(s/def ::UseCode #{"" "C" "D" "HC" "K" "KL" "QK" "W" "WC" "WP"})
 (s/def ::Designer  #{"2 x 4" "Abbott Miller" "Alejandro Cardenas" "Anni Albers 1974" "David Adjaye"
                      "Dorothy Cosonas" "Eszter Haraszty 1953" "Irma Boom" "Jhane Barnes" "Kari Pei"
                      "KnollTextiles" "KnollTextiles 1961" "KnollTextiles 1972" "LTL" "Maria Cornejo" "N/A"
@@ -126,11 +118,13 @@
                    {:Id 58, :Type "Osnaburg (Polyester/Cotton)"}
                    {:Id 59, :Type "Acrylic FR"}
                    {:Id 61, :Type "NanoGuard"}
-                   {:Id 62, :Type "Rayon"}})
+                   {:Id 62, :Type "Rayon"}
+                   {:Id 63, :Type "BA2"}
+                   {:Id 64, :Type "Foam with Knit Backing"}})
 (s/def ::Backings (s/coll-of ::Backing :distinct true :max-count 2))
 (s/def ::UpholsteryType  #{"N/A" "Heavy duty" "Light duty" "Light to Medium" "Medium duty" "Medium to Heavy" "Outdoor Heavy Duty"})
 (s/def ::FabricColor (s/keys :req-un [::SkuNumber ::ColorName ::ColorCategory1 ::ColorCategory2 ::ColorCategory3]))
-(s/def ::SkuNumber #{"01" "02" "03" "04" "05" "06" "07" "08" "09" "1" "10" "10A" "10B"
+(s/def ::SkuNumber string? #_#{"01" "02" "03" "04" "05" "06" "07" "08" "09" "1" "10" "10A" "10B"
                      "11" "110" "114" "11A" "12" "120" "12A" "12B" "13" "130" "13A" "14"
                      "140" "14A" "15" "15 " "150" "152" "155" "15A " "16" "160 " "16A"
                      "17" "170" "172" "174" "175" "18" "180" "19" "1A" "1B" "2" "20" "21"
@@ -148,7 +142,7 @@
                      "79" "7A" "7B" "8" "80" "81" "82" "8223" "83" "8316" "84" "85" "86"
                      "8623279" "8623584" "8624341" "8624659" "8628316" "87" "8A" "8B" "9"
                      "9391" "9480" "9A" "9B"})
-(s/def ::ColorName (into #{} unique-color-names))
+(s/def ::ColorName string? #_(into #{} unique-color-names))
 (s/def ::ColorCategory (s/nilable #{"" "Beige" "Black" "Blue" "Brown" "Cool Neutral" "Gold  " "Gray" "Green"
                                     "Neutral" "Orange" "Pink" "Purple" "Red" "Violet" "Warm Neutral" "White"
                                     "Yellow"}))
@@ -157,7 +151,7 @@
 (s/def ::ColorCategory3 ::ColorCategory)
 (s/def ::FabricColors (s/coll-of ::FabricColor))
 (s/def ::TestingResult (s/keys :req-un [::TestName ::TestResultName ::TestResult ::DateTested ::Status]))
-(s/def ::TestName #{"AATCC  TM 30 anti-microbial & mildew resistant" "AATCC TM 107 colorfastness to water" "AATCC TM 147 anti-bacterial"
+(s/def ::TestName string? #_#{"AATCC  TM 30 anti-microbial & mildew resistant" "AATCC TM 107 colorfastness to water" "AATCC TM 147 anti-bacterial"
                     "ASTM 751-06 Seam Strength" "ASTM C423 Acoustical " "ASTM C423 Acoustical Drapery" "ASTM D 3884 - Taber Abrasion"
                     "ASTM D1203 Method A Volatile Loss of Plasticizer" "ASTM D2097/CFFA 10 Flex Resistance" "ASTM D3389 Taber Abrasion Resistance"
                     "ASTM D751 Initial Adhesion of Coating to Substrate" "ASTM D751 Sect 45-48 Adhesion of Coating to Substrate"
@@ -187,10 +181,10 @@
 (s/def ::TestResult (s/nilable (s/or :testresult #{"\tCLASS A, FS:5, SD:50" " 4 " " 4.5" " 5" "-.05 NRC; SAA .98 " "-.1 NRC;SAA1.03" "-0.3" "-0.5" "-0.7%" "-1.0" "-1.0%" "-1.5" "-1.5%" "-1.7" ".15 NRC ;SAA .81" "0 Fungal Activity" "0-Activity" "0.0" "0.5% after 5 cycles" "0.72mm" "1.5% after 5 cycles" "100" "100 SB" "100 lbf" "100,000" "100,000+" "100.4 SB" "100000" "101" "101 SB" "101.4" "101.5" "101.5 SB" "101.5 SS" "101.6" "102" "102 lbf" "102.2 SB" "102.5" "102.5 SB" "102.5 lbf." "102.9" "103" "103 FBS" "103 SB" "103.4" "103.6" "103.8 FB" "104.2 SB" "104.5 SS" "104.8 SB" "105" "105 SB" "105.2" "105.5" "105.5 FB" "105.5 SB" "105.6" "106" "106 lbf" "106.0" "106.5 SB" "107" "107 SB" "107 lbs" "107.2" "107.5" "107.5 SB" "108" "108 SB" "108.2" "108.5 " "108.5 FB" "109" "109 lbs." "109.0 lbf" "109.5" "109.5 lbf" "110" "110 SB" "110.2 SB" "110.9" "111" "111 SB" "111.5 SB" "111.5 lbf" "112" "112 SB" "112 lbf" "112 lbs." "112.4 sb" "112.5 SB" "113" "113 SB" "113 lbs." "113.3" "113.5 SB" "114 lbf" "114.5 SB" "115" "115.4 lbs" "115.5" "115.5 SB" "116" "116.5" "116.5 lbf" "117" "117 SB" "117 lbf" "117 lbf." "117.5 SB" "118" "118 lbs" "118.5 SB" "118.6" "119" "119 SB" "119 lbs" "119.0 lbf" "119.5 lbf" "120" "120 lbs" "120.5 FBS" "120.5 SB" "121" "121 lbf. warp; 125 lbf. fill" "122" "122 lbs" "123" "123 SB" "123 lbf" "123.5" "124" "124 lbf" "124.5 SB" "124.5 lbf" "125" "126" "126.5" "127" "127.5 SB" "127.71 lbs." "128 SB" "128 lbs." "128.8" "129" "129 lbf" "129 lbs." "129.5 SB" "130 SB" "130.5 lbf" "131" "131 SB" "131 lbs" "132" "133" "133 SB" "134 SB" "134 lbs" "135" "135.7" "136" "136 lbf" "137" "137.5 lbf" "138" "138.5 SB" "139" "139 lbs." "140" "140.5 SB" "141" "141.3 lbs" "141.5 lbf" "142" "143" "144" "144 SB" "145" "145.5" "145.5 SB" "146" "146 lbf." "146.0 lbf" "147" "148" "148 SB" "149" "15,000" "15,000 Cotton" "150" "150 lbs." "151" "152" "152 lbs." "153" "154" "155" "156" "156 lbs" "157 lbs" "158" "158 lbs" "159 lbs" "16 SB" "16 SS" "160" "162" "163" "164" "164 lbs" "165" "166" "166.2" "167" "168" "169" "169 lbs" "170" "170 lbs" "171" "172" "172 lbs" "173" "174" "175" "175 lbs" "176" "177" "178" "179" "179 lbs" "18.5" "181" "181 lbs" "182" "183" "184" "185" "186" "187" "188" "189" "189 lbs" "190" "190.5" "192" "193" "194" "196" "197" "197 lbs." "198" "198 lbs" "199" "2" "2 " "2 - No blocking: Slight adhesion" "20,000" "20,000+" "200" "200 lbs" "200,000+" "201" "202" "203" "204" "205" "205 lbs" "205 lbs." "206" "207" "208" "209" "210" "211" "212" "213" "213 lbs" "214" "215" "215.29" "216" "217" "218 lbs" "219" "219 lbs" "22" "22,000" "221" "222" "223 lbs." "224" "225" "226" "226.83" "227" "228" "229"}
                                      :other string?)))
 (def datetested-gen (gen/large-integer* {:min 345186000000 :max 1535515200000}))
-(s/def ::DateTested (s/with-gen (s/nilable (s/and int? #(<= 345186000000 % 1535515200000))) (fn [] datetested-gen)))
+(s/def ::DateTested (s/with-gen (s/nilable (s/and int? #(<= 345186000000 % 1550638800000))) (fn [] datetested-gen)))
 (s/def ::Status #{"" "Tested"})
 (s/def ::TestingResults (s/coll-of ::TestingResult))
-(s/def ::WidthFormatted (s/nilable #{"102 in." "110 in." "115.7 in." "118 in." "36 in." "48 in." "50 (approx.) in." "50 in." "51 in." "52 in." "53 in." "54 in." "54* in." "55 in." "56 in." "57 in." "58 in." "59 in." "60 in." "61 in." "62 in." "65 in." "66 in." "67 in." "68 in." "71 in." "72 in." "74 in." "78 in."}))
+(s/def ::WidthFormatted (s/nilable string? #_#{"102 in." "110 in." "115.7 in." "118 in." "36 in." "48 in." "50 (approx.) in." "50 in." "51 in." "52 in." "53 in." "54 in." "54* in." "55 in." "56 in." "57 in." "58 in." "59 in." "60 in." "61 in." "62 in." "65 in." "66 in." "67 in." "68 in." "71 in." "72 in." "74 in." "78 in."}))
 (s/def ::UpholsteryGrade (s/nilable #{"" "A" "B" "B " "C" "Custom" "D" "E" "F" "G" "H" "I"}))
 (s/def ::Nafta (s/or :true true? :false false?))
 (s/def ::ContentItem (s/keys :req-un [::Content ::Percentage]))
@@ -207,12 +201,12 @@
                    "Post Consumer Recycled Polyester" "Post Consumer Recycled Polyester with Agion®"
                    "Post Industrial Recycled Polyester" "Pure New Wool" "Ramie" "Rayon" "Rayon (Face)"
                    "Recycled  Polyester" "Recycled Cotton" "Recycled Glass" "Recycled Solution Dyed Nylon"
-                   "Silk" "Solution Dyed Nylon" "Solution Dyed Polyester" "Sunbrella® Acrylic"
+                   "Silk" "SIO Medical Grade Silicone" "Solution Dyed Nylon" "Solution Dyed Polyester" "Sunbrella® Acrylic"
                    "Sunbrella® Polyester" "Sunbrella® Post-Industrial Recycled Acrylic"
                    "Terratex post-consumer recycled polyester" "Terratex post-industrial recycled polyester"
                    "Thermoplastic Olefin" "Trevira CS  Polyester" "Trevira FR Polyester" "Vicose" "Vinyl"
                    "Vinyl (Face)" "Vinyl Coated Polyester" "Virgin Polyester" "Virgin Solution Dyed Nylon"
-                   "Viscose" "Wool" "Wool pile" "Zeftron Nylon" "polyester" "Polyester Microfiber"})
+                   "Viscose" "Wool" "Wool pile" "Woodpulp" "Zeftron Nylon" "polyester" "Polyester Microfiber"})
 (s/def ::Content content-set)
 (s/def ::Percentage (s/double-in :min 0.0 :max 100.0))
 
@@ -241,7 +235,7 @@
                    (fn [c] (let [sum (reduce + (map :Percentage c))] (or (= sum 100.0)
                                                                          (= sum 0))))))
 (s/def ::CleaningCodeName (s/nilable #{"" "S" "W" "W Bleach" "W-S" "W-S Bleach" "X"}))
-(s/def ::MinimumColor #{"" "*198 " "100" "100 yds" "1000" "1000 yards" "105 yards" "110" "115" "115 yards"
+(s/def ::MinimumColor string? #_#{"" "*198 " "100" "100 yds" "1000" "1000 yards" "105 yards" "110" "115" "115 yards"
                         "118 yards/color" "120" "120 YDS" "120 yards" "120 yds" "1200" "128" "130" "130 yards"
                         "130 yds - 2 pieces" "130 yds, upcharge" "132" "135 yards" "1400" "150" "1500"
                         "156 yards" "160" "165" "165 yards" "165 yds" "175" "175 yards" "175 yds" "176"
@@ -260,7 +254,7 @@
 (s/def ::NetPriceFormatted (into #{} (map #(str (.format (java.text.NumberFormat/getCurrencyInstance US-locale) %) " USD") (range 0 370 0.5))))
 (s/def ::CanadianPriceFormatted (into #{} (map #(str (.format (java.text.NumberFormat/getCurrencyInstance CA-locale) %) " CAD") (range 0 480 0.5))))
 
-(s/def ::Width (s/nilable #{"102" "110" "115.7" "118" "36" "48" "50" "50 (approx.)" "51" "52" "53" "54" "54*"
+(s/def ::Width (s/nilable string? #_#{"102" "110" "115.7" "118" "36" "48" "50" "50 (approx.)" "51" "52" "53" "54" "54*"
                             "55" "56" "57" "58" "59" "60" "61" "62" "65" "66" "67" "68" "71" "72" "74" "78"}))
 (s/def ::Country (s/nilable #{"Austria" "Belgium" "Brazil" "Canada" "China" "France" "Germany" "Holland" "India"
                               "Israel" "Italy" "Japan" "Malaysia" "Mexico" "Netherlands" "New Zealand" "Scotland"
@@ -268,8 +262,18 @@
 (s/def ::PanelGrade (s/nilable #{"" "10" "20" "30" "40" "45" "50" "55"}))
 (s/def ::CopyrightYear (into #{"N/A"} (map str (range 1960 2021))))
 (s/def ::Version #{"" "C" "D" "H" "HC" "K" "QK" "W" "WC"})
-(s/def ::PatternHorizontalFormatted (s/nilable (into #{"0.09" "0.3" "0.45" "2.3" "2.38" "3.6" "19.6"} (map str (range 0.0 100.0 0.25)))))
-(s/def ::Weight (into #{"N/A" "7.1" "2.6" "16.8"} (map str (range 0.0 44.0 0.25))))
+(s/def ::PatternHorizontal string? #_#{"0.0" "0.09" "0.25" "0.3" "0.45" "0.5" "0.75" "1.0" "1.25" "1.5" "1.75" "10.0"
+                              "10.5" "10.75" "11.0" "11.75" "12.0" "12.5" "13.0" "13.5" "13.75" "14.0" "14.25"
+                              "14.5" "14.75" "15.0" "15.25" "16.5" "17.25" "17.5" "18.0" "18.5" "19.6" "2.0"
+                              "2.25" "2.3" "2.38" "2.5" "2.75" "20.5" "24.25" "25.0" "25.5" "26.5" "27.0" "27.25"
+                              "27.5" "27.75" "28.0" "28.25" "29.5" "3.0" "3.25" "3.5" "3.6" "3.75" "30.25" "36.0"
+                              "37.0" "4.0" "4.25" "4.5" "4.75" "48.0" "5.0" "5.25" "5.75" "50.0" "51.0" "51.25"
+                              "52.0" "53.0" "54.0" "54.75" "55.0" "56.0" "58.0" "6.0" "6.25" "6.5" "6.75" "7.0"
+                              "7.25" "7.75" "71.75" "72.0" "8.0" "8.25" "8.5" "9.0" "9.25" "9.5" "99.0"})
+(s/def ::PatternHorizontalFormatted (s/nilable string? #_(into #{"0.09" "0.3" "0.45" "2.3" "2.38" "3.6" "19.6"} (map str (range 0.0 100.0 0.25)))))
+(s/def ::Weight string? #_(into #{"N/A" "7.1" "2.6" "16.8"} (map str (range 0.0 44.0 0.25))))
+(s/def ::WeightFormatted (s/nilable string? #_(into #{"N/A" "7.1 oz." "2.6 oz." "16.8 oz."} (map #(str % " oz." ) (range 1.0 44.0 0.25)))))
+
 (s/def ::Textiles (s/coll-of ::Textile))
 
 
@@ -313,19 +317,30 @@
 (defn get-textile-attribute-sorted-set [path]
   (into (sorted-set) (select path @fabrics)))
 
-(def crossroad (get-fabric 2085)) ; good for testing Fabric Uses, Multiple Content % and Minimum Custom Color yardage
-(def bollywood (get-fabric 1015))
-(def beacon (get-fabric 1597))
-(def shima (get-fabric 1468))
-(def abacus (get-fabric 715))
-(def stripemania (get-fabric 2225))
-(def brigadoon (get-fabric 2167))
-(def sideline (get-fabric 2210))
-(def swoosh (get-fabric 1583))
-(def modern-tweed (get-fabric 2155))
-(def acme-backed (get-fabric 992189))
-(def arabella (get-fabric 1475))
-(def kamani (get-fabric 1580))
+(def Crossroad (get-fabric 2085)) ; good for testing Fabric Uses, Multiple Content % and Minimum Custom Color yardage
+(def Bollywood (get-fabric 1015))
+(def Beacon (get-fabric 1597))
+(def Shima (get-fabric 1468))
+(def Abacus (get-fabric 715))
+(def Alignment (get-fabric 349))
+(def Stripemania (get-fabric 2225))
+(def Brigadoon (get-fabric 2167))
+(def Sideline (get-fabric 2210))
+(def Swoosh (get-fabric 1583))
+(def Modern-tweed (get-fabric 2155))
+(def Acme-backed (get-fabric 992189))
+(def Arabella (get-fabric 1475))
+(def Kamani (get-fabric 1580))
+(def Versatility (get-fabric 432))
+(def Prairie (get-fabric 1925))
+
+(def Impressions-Biscayne (get-fabric 9019))
+(def Impressions-Chronicle (get-fabric 9020))
+(def Impressions-Honour (get-fabric 9021))
+(def Impressions-Icon (get-fabric 9022))
+(def Impressions-Marquee (get-fabric 9023))
+(def Impressions-Shima (get-fabric 9024))
+(def Impressions-Solid (get-fabric 9025))
 
 
 #_(s/valid? ::Textile (first (gen/sample (s/gen ::Textile) 1)))
@@ -338,5 +353,4 @@
       (s/explain ::Textiles @fabrics))
     (println "All Textiles are valid.")))
 
-(validate-all-textiles)
-
+#_(validate-all-textiles)

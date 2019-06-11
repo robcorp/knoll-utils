@@ -145,6 +145,9 @@
   (set-customindexevent env false))
 
 (let [running (atom {::dev2 false ::staging false ::prod false})]
+  (defn running? []
+    @running)
+  
   (defn reindex [env]
     "Sends the reindex http request for the specified env on a newly created channel.
 Uses running flags to prevent sending multiple overlapping reindex requests."
@@ -157,7 +160,7 @@ Uses running flags to prevent sending multiple overlapping reindex requests."
         (let [custom-index-event (first (select systemevents (where {:eventname "CustomIndexEvent"})))
               url (str (-> config env ::url) "/cs/" (:TARGET custom-index-event) "?" (:PARAMS custom-index-event))
               ch (chan)]
-          (go (>! ch (http/get url)))
+          (go (>! ch (http/get url {:socket-timeout 360000 :connection-timeout 360000}))) ; 6 minute timeouts
           (go (when-let [_ (<! ch)]
                 (swap! running update env not)
                 (println "\nReindexing" env "complete."))))

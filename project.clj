@@ -5,7 +5,8 @@
             :url "http://www.eclipse.org/legal/epl-v10.html"}
 
   :dependencies [[org.clojure/clojure "1.10.1"]
-                 [org.clojure/core.async "0.4.490"]
+                 #_[org.clojure/core.async "0.4.490"]
+                 [org.clojure/core.async "0.4.500"]
                  [org.clojure/test.check "0.9.0"]
                  [orchestra "2018.12.06-2"]
                  [nrepl "0.5.3"]
@@ -25,6 +26,7 @@
 
   :plugins [
             #_[cider/cider-nrepl "0.19.0"]
+            #_[cider/cider-nrepl "0.22.0-beta4"]
             #_[lein-gorilla "0.4.0"]
             #_[lein-localrepo "0.5.4"]]
 

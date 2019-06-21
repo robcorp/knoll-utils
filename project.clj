@@ -20,6 +20,7 @@
                  [etaoin "0.2.8-SNAPSHOT"]
                  [com.novemberain/monger "3.5.0"]
                  [proto-repl "0.3.1"]
+                 [itsy "0.1.1"]
                  #_[org.gebish/geb-core "2.0"]
                  #_[clucy "0.4.0"]
                  #_[com.cerner/clara-rules "0.19.0"]]

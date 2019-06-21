@@ -94,33 +94,31 @@
 
 (defn show-customindexevents [env]
   (connect env)
-  (->
+  (print-table
    (select systemevents
            (fields :eventname :enabled :times)
-           (where {:eventname [in ["CustomIndexEvent" "CustomTextileIndexEvent"]]}))
-   print-table))
+           (where {:eventname [in ["CustomIndexEvent" "CustomTextileIndexEvent"]]}))))
 
 (defentity knollluceneindexjobqueue)
 
 (defn show-index-queue-counts [env]
   (connect env)
-  (->
+  (print-table
    (select knollluceneindexjobqueue
            (fields :assettype (raw "count(*) as COUNT"))
            (where {:index_status [in ["added" "updated" "update_failed"]]})
            (group :assettype)
-           (order :assettype))
-   print-table))
+           (order :assettype))))
 
 (defn show-index-queue [env]
   (connect env)
-  (->
+  (print-table
    (select knollluceneindexjobqueue
            (fields :assetid :assettype :index_status)
            (where {:index_status [in ["added" "updated" "update_failed"]]})
            #_(group :assettype)
-           (order :assettype))
-   print-table))
+           (order :assettype))))
+
 (s/def ::index-q-record (s/keys :req-un [::ASSETTYPE ::COUNT]))
 (s/def ::ASSETTYPE string?)
 (s/def ::COUNT #(instance? java.math.BigDecimal %))

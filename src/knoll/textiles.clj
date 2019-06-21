@@ -142,7 +142,7 @@
                      "79" "7A" "7B" "8" "80" "81" "82" "8223" "83" "8316" "84" "85" "86"
                      "8623279" "8623584" "8624341" "8624659" "8628316" "87" "8A" "8B" "9"
                      "9391" "9480" "9A" "9B"})
-(s/def ::ColorName string? #_(into #{} unique-color-names))
+(s/def ::ColorName string? #_(set unique-color-names))
 (s/def ::ColorCategory (s/nilable #{"" "Beige" "Black" "Blue" "Brown" "Cool Neutral" "Gold  " "Gray" "Green"
                                     "Neutral" "Orange" "Pink" "Purple" "Red" "Violet" "Warm Neutral" "White"
                                     "Yellow"}))
@@ -233,7 +233,7 @@
 (s/def ::Contents (s/and
                    (s/coll-of ::ContentItem :max-count 5)
                    (fn [c] (let [sum (reduce + (map :Percentage c))] (or (= sum 100.0)
-                                                                         (= sum 0))))))
+                                                                         (zero? sum))))))
 (s/def ::CleaningCodeName (s/nilable #{"" "S" "W" "W Bleach" "W-S" "W-S Bleach" "X"}))
 (s/def ::MinimumColor string? #_#{"" "*198 " "100" "100 yds" "1000" "1000 yards" "105 yards" "110" "115" "115 yards"
                         "118 yards/color" "120" "120 YDS" "120 yards" "120 yds" "1200" "128" "130" "130 yards"
@@ -251,8 +251,8 @@
 ;; specs for staging textiles service
 (def US-locale (java.util.Locale. "en" "US"))
 (def CA-locale (java.util.Locale. "en" "CA"))
-(s/def ::NetPriceFormatted (into #{} (map #(str (.format (java.text.NumberFormat/getCurrencyInstance US-locale) %) " USD") (range 0 370 0.5))))
-(s/def ::CanadianPriceFormatted (into #{} (map #(str (.format (java.text.NumberFormat/getCurrencyInstance CA-locale) %) " CAD") (range 0 480 0.5))))
+(s/def ::NetPriceFormatted (set (map #(str (.format (java.text.NumberFormat/getCurrencyInstance US-locale) %) " USD") (range 0 370 0.5))))
+(s/def ::CanadianPriceFormatted (set (map #(str (.format (java.text.NumberFormat/getCurrencyInstance CA-locale) %) " CAD") (range 0 480 0.5))))
 
 (s/def ::Width (s/nilable string? #_#{"102" "110" "115.7" "118" "36" "48" "50" "50 (approx.)" "51" "52" "53" "54" "54*"
                             "55" "56" "57" "58" "59" "60" "61" "62" "65" "66" "67" "68" "71" "72" "74" "78"}))

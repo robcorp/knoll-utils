@@ -1,7 +1,7 @@
 (ns knoll.web
   (:require [clojure.string :as str]
             [clojure.set :as set]
-            [itsy.core :refer [crawl extract-all]]
+            [itsy.core :refer [crawl extract-all stop-workers add-worker remove-worker]]
             [cemerick.url :refer [url]]))
 
 (defn url-path->filename [url-str]
@@ -29,23 +29,38 @@
 
 (defn print-url-handler [{:keys [url body]}]
   (println url)
-  (Thread/sleep 500))
+  #_(spit "/Users/robcorp/temp/seen-urls.txt" url :append true)
+  (Thread/sleep 250))
 
 (defn knoll-dot-com-filter [url-set]
   (->> url-set
-       (remove #(or (.contains (.toLowerCase %) "javascript:")
-                    (.contains % "mailto:")
-                    (.contains % "tel:")
-                    (.contains % "/css/")
-                    (.contains % "/story/")
-                    (.contains % "/document/")
-                    (.contains % "/nkdc/")
-                    (.contains % "/pdf.js/")
-                    #_(.contains % "knolltextileproductdetail")))
+       (remove #(or
+                 (.contains % "/css/")
+                 (.contains % "/story/")
+                 (.contains % "/media/")
+                 (.contains % "/document/")
+                 (.contains % "/nkdc/")
+                 (.contains % "/cs/Satellite")
+                 (.contains % "/cart")
+                 (.contains % "/Typicals")
+                 (.contains % "/pdf.js/")
+                 #_(.contains % "/product/")
+                 #_(.contains % "/knolltextileproductdetail/")
+                 (and (.contains % "?") ; remove urls with query params
+                      (not (and (.contains % "/product/") ; unless url is design-side product url
+                                (.contains % "?section=design"))))
+                 (.contains (.toLowerCase %) "javascript:")
+                 (.contains % "mailto:")
+                 (.contains % "tel:")
+                 (.contains % "{{")
+                 (.contains % "}}")
+                 (.contains % "+link[2]+") ; comes from some embedded js code
+                 #_(re-find #"\{\{.*\}\}" %) ; Mustache template 
+                 ))
        #_(filter #(or (.startsWith % "https://www.knoll.com/shop/")
-                    (.startsWith % "https://www.knoll.com/discover-knoll/")
-                    (.startsWith % "https://www.knoll.com/product/")
-                    (.startsWith % "https://www.knoll.com/knollnewsdetail/")))
+                      (.startsWith % "https://www.knoll.com/discover-knoll/")
+                      (.startsWith % "https://www.knoll.com/product/")
+                      (.startsWith % "https://www.knoll.com/knollnewsdetail/")))
        set))
 
 (defn base-extractor
@@ -87,8 +102,8 @@
   (atom {
          :url "https://www.knoll.com/"
          :handler #'print-url-handler #_#'find-0fe8-handler
-         :workers 5
-         :url-limit 1000
+         :workers 3
+         :url-limit 3000
          :url-extractor (make-custom-extractor knoll-dot-com-filter)
          :http-opts {}
          :host-limit true
@@ -96,3 +111,10 @@
 
 (def crawler (crawl @crawl-opts))
 
+#_(remove-worker crawler)
+
+#_(add-worker crawler)
+
+#_(stop-workers crawler)
+
+(remaining-urls crawler)

@@ -334,6 +334,9 @@
 (def Versatility (get-fabric 432))
 (def Prairie (get-fabric 1925))
 (def Its-Complicated (get-fabric 2252))
+(def Swank (get-fabric 2221))
+(def Script (get-fabric 2328))
+(def Script-Backed (get-fabric 992328))
 
 (def Impressions-Biscayne (get-fabric 9019))
 (def Impressions-Chronicle (get-fabric 9020))

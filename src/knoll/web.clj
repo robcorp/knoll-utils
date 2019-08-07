@@ -102,7 +102,7 @@
   (atom {
          :url "https://www.knoll.com/"
          :handler #'print-url-handler #_#'find-0fe8-handler
-         :workers 3
+         :workers 2
          :url-limit 3000
          :url-extractor (make-custom-extractor knoll-dot-com-filter)
          :http-opts {}

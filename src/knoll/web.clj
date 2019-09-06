@@ -57,6 +57,7 @@
                  (.contains % "+link[2]+") ; comes from some embedded js code
                  #_(re-find #"\{\{.*\}\}" %) ; Mustache template 
                  ))
+       (map #(str/replace % #"#.*$" ""))
        #_(filter #(or (.startsWith % "https://www.knoll.com/shop/")
                       (.startsWith % "https://www.knoll.com/discover-knoll/")
                       (.startsWith % "https://www.knoll.com/product/")
@@ -99,11 +100,10 @@
   (-> c :state :url-queue count))
 
 (def crawl-opts
-  (atom {
-         :url "https://www.knoll.com/"
+  (atom {:url "https://www.knoll.com/"
          :handler #'print-url-handler #_#'find-0fe8-handler
-         :workers 2
-         :url-limit 3000
+         :workers 4
+         :url-limit 4000
          :url-extractor (make-custom-extractor knoll-dot-com-filter)
          :http-opts {}
          :host-limit true
@@ -118,3 +118,5 @@
 #_(stop-workers crawler)
 
 (remaining-urls crawler)
+
+(:workers crawler)

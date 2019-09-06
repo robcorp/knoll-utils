@@ -17,7 +17,8 @@
                  [korma "0.4.3"]
                  [org.clojars.zentrope/ojdbc "11.2.0.3.0"]
                  [net.sf.jt400/jt400 "9.4"] ; for TPID db
-                 [etaoin "0.2.8-SNAPSHOT"]
+                 #_[etaoin "0.2.8-SNAPSHOT"]
+                 [etaoin "0.3.5"]
                  [com.novemberain/monger "3.5.0"]
                  [proto-repl "0.3.1"]
                  [itsy "0.1.1"]

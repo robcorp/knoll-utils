@@ -7,8 +7,8 @@
 (defn url-path->filename [url-str]
   (let [url-path (-> url-str url :path)
         name (.. url-path
-            (replaceFirst "/" "")
-            (replace "/" "-"))]
+            (str/replace-first "/" "")
+            (str/replace "/" "-"))]
     (str name ".txt")))
 
 (def url-count (atom 0))
@@ -25,7 +25,7 @@
       (println)
       (println url file))
     (print "."))
-  (Thread/sleep 500))
+  (Thread/sleep 250))
 
 (defn print-url-handler [{:keys [url body]}]
   (println url)
@@ -101,7 +101,7 @@
 
 (def crawl-opts
   (atom {:url "https://www.knoll.com/"
-         :handler #'print-url-handler #_#'find-0fe8-handler
+         :handler #_#'print-url-handler #'find-0fe8-handler
          :workers 4
          :url-limit 4000
          :url-extractor (make-custom-extractor knoll-dot-com-filter)
@@ -109,14 +109,13 @@
          :host-limit true
          :polite? true}))
 
-(def crawler (crawl @crawl-opts))
+(comment (def crawler (do (println "Starting crawl:")
+                          (crawl @crawl-opts)))
+         
+         (remaining-urls crawler)
 
-#_(remove-worker crawler)
+         (remove-worker crawler)
 
-#_(add-worker crawler)
+         (add-worker crawler)
 
-#_(stop-workers crawler)
-
-(remaining-urls crawler)
-
-(:workers crawler)
+         (stop-workers crawler))

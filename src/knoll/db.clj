@@ -5,15 +5,18 @@
                      subselect update where]
              :rename {update upd}]
             [korma.db :as kd
-             :refer [default-connection defdb create-db]]
+             :refer [default-connection create-db]]
             #_[org.httpkit.client :as http]
             [clj-http.client :as http]
-            [com.rpl.specter :as spctr]
+            #_[com.rpl.specter :as spctr]
             [clojure.spec.alpha :as s]
             #_[clojure.spec.test.alpha :as st]
-            [orchestra.spec.test :as st]
-            [clojure.pprint :refer :all]
-            [clojure.core.async :as async :refer [chan >! <! go]]))
+            #_[orchestra.spec.test :as st]
+            [clojure.pprint :refer [print-table]]
+            [clojure.core.async :as async :refer [chan >! <! go]]
+            [next.jdbc :as jdbc]
+            [next.jdbc.connection :as connection])
+  (:import (com.mchange.v2.c3p0 ComboPooledDataSource PooledDataSource)))
 
 
 (s/def ::env-key #{::dev2 ::staging ::prod})
@@ -90,34 +93,56 @@
 ;;(select systemusers (where (raw "ROWNUM = 1")))
 ;;(select systemusers (fields (raw "count(*) as COUNT")))
 
+(defn- loop-print-helper [f]
+  (run! #(do
+           (println)
+           (f %)
+           (println))
+        (keys config)))
+
 (defentity systemevents)
 
-(defn show-customindexevents [env]
-  (connect env)
-  (print-table
-   (select systemevents
-           (fields :eventname :enabled :times)
-           (where {:eventname [in ["CustomIndexEvent" "CustomTextileIndexEvent"]]}))))
+(defn show-customindexevents
+  ([]
+   (loop-print-helper show-customindexevents))
+  
+  ([env]
+   (connect env)
+   (print env)
+   (print-table
+    (select systemevents
+            (fields :eventname :enabled :times)
+            (where {:eventname [in ["CustomIndexEvent" "CustomTextileIndexEvent"]]})))))
 
 (defentity knollluceneindexjobqueue)
 
-(defn show-index-queue-counts [env]
-  (connect env)
-  (print-table
-   (select knollluceneindexjobqueue
-           (fields :assettype (raw "count(*) as COUNT"))
-           (where {:index_status [in ["added" "updated" "update_failed"]]})
-           (group :assettype)
-           (order :assettype))))
+(defn show-index-queue-counts
+  ([]
+   (loop-print-helper show-index-queue-counts))
 
-(defn show-index-queue [env]
-  (connect env)
-  (print-table
-   (select knollluceneindexjobqueue
-           (fields :assetid :assettype :index_status)
-           (where {:index_status [in ["added" "updated" "update_failed"]]})
-           #_(group :assettype)
-           (order :assettype))))
+  ([env]
+   (connect env)
+   (print env)
+   (print-table
+    (select knollluceneindexjobqueue
+            (fields :assettype (raw "count(*) as COUNT"))
+            (where {:index_status [in ["added" "updated" "update_failed"]]})
+            (group :assettype)
+            (order :assettype)))))
+
+(defn show-index-queue
+  ([]
+   (loop-print-helper show-index-queue))
+  
+  ([env]
+   (connect env)
+   (print env)
+   (print-table
+    (select knollluceneindexjobqueue
+            (fields :assetid :assettype :index_status)
+            (where {:index_status [in ["added" "updated" "update_failed"]]})
+            #_(group :assettype)
+            (order :assettype)))))
 
 (s/def ::index-q-record (s/keys :req-un [::ASSETTYPE ::COUNT]))
 (s/def ::ASSETTYPE string?)
@@ -146,9 +171,10 @@
   (defn running? []
     @running)
   
-  (defn reindex [env]
+  (defn reindex 
     "Sends the reindex http request for the specified env on a newly created channel.
-Uses running flags to prevent sending multiple overlapping reindex requests."
+  Uses running flags to prevent sending multiple overlapping reindex requests."
+    [env]
     (if (env @running)
       (println "Reindex in" env "is already running.")
       (do
@@ -164,7 +190,7 @@ Uses running flags to prevent sending multiple overlapping reindex requests."
                 (println "\nReindexing" env "complete."))))
         nil))))
 
-(defn get-knolltextile-for-fabricid [env fabid]
+(defn knolltextile-for-fabricid [env fabid]
   (connect env)
   (select product_c
           (where {:id [in (subselect product_c_mungo
@@ -173,22 +199,33 @@ Uses running flags to prevent sending multiple overlapping reindex requests."
                                              {:cs_attrid 1334871353607M}
                                              {:stringvalue fabid})))]})))
 
+(defn fabricid-for-assetid [env assetid]
+  (connect env)
+  (-> (select product_c_mungo
+              (fields :stringvalue)
+              (where (and 
+                      {:cs_ownerid assetid}
+                      {:cs_attrid 1334871353607M})))
+      (first)
+      (:STRINGVALUE)))
+
 
 #_(print-table (select product_a (fields :id :name :description)))
 
 #_(k/delete knollluceneindexjobqueue (where {:assetid 1356039745953}))
 
-(run! #(do
-         (println)
-         (print %)
-         (show-customindexevents %)
-         (println))
-      (keys config))
+(defonce dev2-db-spec {:jdbcUrl "jdbc:oracle:thin:@knldev2wcsdb1.knoll.com:1521:WCSDEV2" :user "ORAWCDEV11" :password "ORAWCDEV11"})
+(defonce staging-db-spec {:jdbcUrl "jdbc:oracle:thin:@knlprdwcsdb.knoll.com:1521:WCSPRDG" :user "ORAPRDWCSMGT2" :password "knolloraprdwcsmgt2"})
+(defonce prod-db-spec {:jdbcUrl "jdbc:oracle:thin:@knlprdwcsdb.knoll.com:1521:WCSPRDG" :user "ORAWCDLV" :password "knollorawcdlv"})
+(defonce dev2-ds (connection/->pool ComboPooledDataSource dev2-db-spec))
+(defonce staging-ds (connection/->pool ComboPooledDataSource staging-db-spec))
+(defonce prod-ds (connection/->pool ComboPooledDataSource prod-db-spec))
+#_(def dev2-ds (jdbc/get-datasource {:jdbcUrl "jdbc:oracle:thin:@knldev2wcsdb1.knoll.com:1521:WCSDEV2" :user "ORAWCDEV11" :password "ORAWCDEV11"}))
+#_(def dev2-conn (jdbc/get-connection dev2-ds))
+(print-table (jdbc/execute! dev2-ds ["select eventname, enabled, times from systemevents where eventname in ('CustomIndexEvent')"]))
+(print-table (jdbc/execute! dev2-ds ["select assettype, count(*), index_status from knollluceneindexjobqueue group by assettype, index_status order by assettype, index_status"]))
 
-(run! #(do
-         (println)
-         (println %)
-         (show-index-queue-counts %)
-         (println))
-      (keys config))
+#_(print-table (jdbc/execute!
+              staging-ds
+              ["select * from product_c where id in (select cs_ownerid from product_c_mungo where cs_attrid = '1334871353607' and stringvalue = ?)" "2085"]))
 

@@ -12,3 +12,7 @@ pom.xml.asc
 /.idea
 knoll.iml
 .DS_Store
+.cpcache/
+.calva
+.rebel_readline_history
+.nrepl-history

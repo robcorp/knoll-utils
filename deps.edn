@@ -5,7 +5,8 @@
                          cider/cider-nrepl          {:mvn/version "0.25.5"}
                          refactor-nrepl/refactor-nrepl {:mvn/version "2.5.0"}
                          com.bhauman/rebel-readline {:mvn/version "0.1.4"}}
-            :main-opts ["-m" "nrepl.cmdline" "-p" "6439"
+            :main-opts ["-m" "nrepl.cmdline"
+                        "-p" "6439"
                         "--middleware" "[refactor-nrepl.middleware/wrap-refactor,cider.nrepl/cider-middleware]"
                         "-i"
                         "-f" "rebel-readline.main/-main"]}
@@ -14,8 +15,19 @@
            {:extra-deps {nrepl/nrepl                   {:mvn/version "0.8.3"}
                          refactor-nrepl/refactor-nrepl {:mvn/version "2.5.0"}
                          cider/cider-nrepl             {:mvn/version "0.25.5"}}
-            :main-opts  ["-m" "nrepl.cmdline" "-p" "6439"
+            :main-opts  ["-m" "nrepl.cmdline"
+                         "-p" "6439"
                          "--middleware" "[refactor-nrepl.middleware/wrap-refactor,cider.nrepl/cider-middleware]"]}
+
+           :reveal-nrepl
+           {:extra-deps {vlaaad/reveal                 {:mvn/version "1.2.180"}
+                         nrepl/nrepl                   {:mvn/version "0.8.3"}
+                         cider/cider-nrepl             {:mvn/version "0.25.5"}
+                         refactor-nrepl/refactor-nrepl {:mvn/version "2.5.0"}}
+            :main-opts  ["-m" "nrepl.cmdline"
+                         "-p" "6439"
+                         "--middleware" "[refactor-nrepl.middleware/wrap-refactor,vlaaad.reveal.nrepl/middleware,cider.nrepl/cider-middleware]"
+                         "-i"]}
 
            :test
            {:extra-paths ["test"]

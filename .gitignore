@@ -16,3 +16,7 @@ knoll.iml
 .calva
 .rebel_readline_history
 .nrepl-history
+.clj-kondo/
+.eastwood
+.lsp/
+itsy.log

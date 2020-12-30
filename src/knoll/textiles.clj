@@ -13,13 +13,13 @@
 
 ;; Textiles Specs
 (comment
- (def unique-color-names (into (sorted-set)
-                               (select [ALL :FabricColors ALL :ColorName] @fabrics)))
+  (def unique-color-names (into (sorted-set)
+                                (select [ALL :FabricColors ALL :ColorName] @fabrics)))
 
- (def unique-color-names (-> (resource "color-names.json")
-                             slurp
-                             (decode true)))
- )
+  (def unique-color-names (-> (resource "color-names.json")
+                              slurp
+                              (decode true)))
+  )
 
 (s/def ::Textile (s/keys :req-un [::FabricUses ::KnollGrade ::PatternVerticalFormatted
                                   ::PatternVertical ::CleaningCode ::FabricId ::NetPrice

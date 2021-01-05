@@ -259,7 +259,7 @@
 (def US-locale (java.util.Locale. "en" "US"))
 (def CA-locale (java.util.Locale. "en" "CA"))
 (s/def ::NetPriceFormatted (set (map #(str (.format (java.text.NumberFormat/getCurrencyInstance US-locale) %) " USD") (range 0 500 0.05))))
-(s/def ::CanadianPriceFormatted (set (map #(str (.format (java.text.NumberFormat/getCurrencyInstance CA-locale) %) " CAD") (range 0 600 0.05))))
+(s/def ::CanadianPriceFormatted (set (map #(str (.format (java.text.NumberFormat/getCurrencyInstance CA-locale) %) " CAD") (range 0 605 0.05))))
 
 (s/def ::Width (s/nilable string? #_#{"102" "110" "115.7" "118" "36" "48" "50" "50 (approx.)" "51" "52" "53" "54" "54*"
                             "55" "56" "57" "58" "59" "60" "61" "62" "65" "66" "67" "68" "71" "72" "74" "78"}))
@@ -267,7 +267,7 @@
                               "Israel" "Italy" "Japan" "Malaysia" "Mexico" "Netherlands" "New Zealand" "Scotland"
                               "South Korea" "Switzerland" "Taiwan" "Turkey" "United Kingdom" "United States"}))
 (s/def ::PanelGrade (s/nilable #{"" "10" "20" "30" "40" "45" "50" "55"}))
-(s/def ::CopyrightYear (into #{"N/A"} (map str (range 1960 2021))))
+(s/def ::CopyrightYear (into #{"N/A"} (map str (range 1960 2022))))
 (s/def ::Version (s/nilable #{"" "C" "D" "H" "HC" "K" "QK" "W" "WC"}))
 (s/def ::PatternHorizontal string? #_#{"0.0" "0.09" "0.25" "0.3" "0.45" "0.5" "0.75" "1.0" "1.25" "1.5" "1.75" "10.0"
                               "10.5" "10.75" "11.0" "11.75" "12.0" "12.5" "13.0" "13.5" "13.75" "14.0" "14.25"
